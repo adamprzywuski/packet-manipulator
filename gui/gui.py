@@ -1,3 +1,4 @@
+import time
 import tkinter as tk
 from tkinter import font as tkfont
 
@@ -12,15 +13,15 @@ class Gui(tk.Tk):
         self.geometry("400x400")
 
         self.title_font = tkfont.Font(family='Helvetica', size=18, weight="bold", slant="italic")
-        container = tk.Frame(self)
-        container.pack(side="top", fill="both", expand=True)
-        container.grid_rowconfigure(0, weight=1)
-        container.grid_columnconfigure(0, weight=1)
+        self.container = tk.Frame(self)
+        self.container.pack(side="top", fill="both", expand=True)
+        self.container.grid_rowconfigure(0, weight=1)
+        self.container.grid_columnconfigure(0, weight=1)
 
         self.frames = {}
         for F in (InterfacePage, PacketPage):
             page_name = F.__name__
-            frame = F(parent=container, controller=self)
+            frame = F(parent=self.container, controller=self)
             self.frames[page_name] = frame
             frame.grid(row=0, column=0, sticky="nsew")
 
@@ -30,6 +31,9 @@ class Gui(tk.Tk):
         '''Show a frame for the given page name'''
         frame = self.frames[page_name]
         frame.tkraise()
+
+    def get_frame(self, page_name):
+        return self.frames[page_name]
 
 
 class InterfacePage(tk.Frame):
@@ -60,6 +64,7 @@ class InterfacePage(tk.Frame):
         print(f"select: {INTERFACE}")
         # print(self.controller.interface)
         # print(INTERFACE)
+        self.controller.get_frame("PacketPage").update_interface(INTERFACE)
         self.controller.show_frame("PacketPage")
 
 
@@ -67,10 +72,18 @@ class PacketPage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         self.controller = controller
-        label = tk.Label(self, text=f"You successfully chosen {INTERFACE}")
-        label.pack(side="top", fill="x", pady=10)
+        self.interface = "aaa"
+        print(f"packet: {INTERFACE}")
+        self.label = tk.Label(self, text=f"You successfully chosen {INTERFACE}")
+        self.label.pack(side="top", fill="x", pady=10)
         button = tk.Button(self, text="Change interface", command=lambda: controller.show_frame("InterfacePage"))
         button.pack()
+
+    def update_interface(self, interface):
+        self.interface = interface
+        print(f"update_interface: {self.interface}")
+        self.label.config(text=f"interface: {self.interface}")
+
 
 
 if __name__ == "__main__":
