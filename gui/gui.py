@@ -2,9 +2,11 @@ import time
 import tkinter as tk
 from tkinter import font as tkfont
 
-# global interface
-# global INTERFACE
-INTERFACE = "123"
+from show_interfaces import get_interfaces
+
+
+class FilterParameters:
+    interface = ""
 
 
 class Gui(tk.Tk):
@@ -44,7 +46,7 @@ class InterfacePage(tk.Frame):
         label = tk.Label(self, text="Choose interface", font=controller.title_font)
         label.pack(side="top", fill="x", pady=10)
 
-        interface_list = ["Ethernet 1", "Ethernet 2", "Ethernet 3"]
+        interface_list = get_interfaces()
 
         self.interface_listbox = tk.Listbox(self)
         for interface in interface_list:
@@ -58,13 +60,9 @@ class InterfacePage(tk.Frame):
         self.select_button.pack(pady=5)
 
     def select(self):
-        # self.myLabel.config(text=self.interface_listbox.get(tk.ANCHOR))
-        global INTERFACE
-        INTERFACE = self.interface_listbox.get(tk.ANCHOR)
-        print(f"select: {INTERFACE}")
-        # print(self.controller.interface)
-        # print(INTERFACE)
-        self.controller.get_frame("PacketPage").update_interface(INTERFACE)
+        FilterParameters.interface = self.interface_listbox.get(tk.ANCHOR)
+        print(f"select: {FilterParameters.interface}")
+        self.controller.get_frame("PacketPage").update_interface()
         self.controller.show_frame("PacketPage")
 
 
@@ -72,18 +70,14 @@ class PacketPage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         self.controller = controller
-        self.interface = "aaa"
-        print(f"packet: {INTERFACE}")
-        self.label = tk.Label(self, text=f"You successfully chosen {INTERFACE}")
+        self.label = tk.Label(self, text=f"")
         self.label.pack(side="top", fill="x", pady=10)
         button = tk.Button(self, text="Change interface", command=lambda: controller.show_frame("InterfacePage"))
         button.pack()
 
-    def update_interface(self, interface):
-        self.interface = interface
-        print(f"update_interface: {self.interface}")
-        self.label.config(text=f"interface: {self.interface}")
-
+    def update_interface(self):
+        print(f"update_interface: {FilterParameters.interface}")
+        self.label.config(text=f"interface: {FilterParameters.interface}")
 
 
 if __name__ == "__main__":

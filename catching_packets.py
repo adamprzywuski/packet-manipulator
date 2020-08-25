@@ -18,7 +18,7 @@ def packet_callback(packet):
 # allows to exchange ip to http adress
 def get_host_for_ip(ip):
     try:
-        hos t =socket.gethostbyaddr(ip)
+        host =socket.gethostbyaddr(ip)
     except socket.error:
         return ip
     return host
