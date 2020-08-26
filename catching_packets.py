@@ -9,8 +9,8 @@ def packet_callback(packet):
     if packet['TCP'].payload:
         pkt = str(packet['TCP'].payload)
 
-        #if packet['IP'].dport == 80:
-        print("\n{} ----HTTP----> {}:{}:\n{}".format(get_host_for_ip(packet['IP'].src), get_host_for_ip(packet['IP'].dst), packet['IP'].dport, str(bytes(packet['TCP'].payload))))
+        if packet['IP'].dport == 80:
+            print("\n{} ----HTTP----> {}:{}:\n{}".format(get_host_for_ip(packet['IP'].src), get_host_for_ip(packet['IP'].dst), packet['IP'].dport, str(bytes(packet['TCP'].payload))))
 
         #print(get_host_for_ip(packet['IP'].src))
         sniff(filter="tcp", prn=packet_callback, store=0)
@@ -24,6 +24,6 @@ def get_host_for_ip(ip):
     return host
 
 if __name__ == '__main__':
-    print(ifaces)
+
     print("program wlaczony")
-    sniff(filter="tcp", prn=packet_callback, store=0)
+    sniff(filter="tcp",iface=None, prn=packet_callback, store=0)
