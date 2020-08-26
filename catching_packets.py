@@ -11,7 +11,8 @@ def packet_callback(packet):
 
         if packet['IP'].dport == 80:
             print("\n{} ----HTTP----> {}:{}:\n{}".format(get_host_for_ip(packet['IP'].src), get_host_for_ip(packet['IP'].dst), packet['IP'].dport, str(bytes(packet['TCP'].payload))))
-
+        elif packet['IP'].dport==443:
+            print("\n{}----SSL----> {}:{}".format(get_host_for_ip(packet['IP'].src), get_host_for_ip(packet['IP'].dst),packet['IP'].dport))
         #print(get_host_for_ip(packet['IP'].src))
         sniff(filter="tcp", prn=packet_callback, store=0)
 
