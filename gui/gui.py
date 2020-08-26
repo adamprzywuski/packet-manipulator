@@ -1,4 +1,5 @@
 import asyncio
+import queue
 import time
 import tkinter as tk
 import tkinter.ttk as ttk
@@ -38,14 +39,8 @@ class Gui(tk.Tk):
         frame.tkraise()
         if page_name == "PacketPage":
             # self.after(20000, self.nothing())
-            self.after(2000, frame.update_packets())
+            self.after(0, frame.do_asyncio())
             # frame.update_packets()
-
-    def nothing(self):
-        pass
-
-
-
 
     def get_frame(self, page_name):
         return self.frames[page_name]
@@ -82,7 +77,7 @@ class InterfacePage(tk.Frame):
         self.select_button.pack(pady=5)
 
     def select(self):
-        FilterParameters.interface = self.interface_list[int(self.interface_listbox.focus())-1].name
+        FilterParameters.interface = self.interface_list[int(self.interface_listbox.focus()) - 1].name
         print(f"select: {FilterParameters.interface}")
         self.controller.get_frame("PacketPage").update_interface()
         self.controller.show_frame("PacketPage")
@@ -90,8 +85,9 @@ class InterfacePage(tk.Frame):
 
 class PacketPage(tk.Frame, threading.Thread):
     def __init__(self, parent, controller):
-        self.asyncio_loop = asyncio.get_event_loop()
         tk.Frame.__init__(self, parent)
+        self.the_queue = queue.Queue()
+        self.thread = AsyncioThread(self.the_queue)
         self.controller = controller
         self.label = tk.Label(self, text=f"")
         self.label.pack(side="top", fill="x", pady=10)
@@ -109,50 +105,71 @@ class PacketPage(tk.Frame, threading.Thread):
         button.pack(pady=10)
         # self.update_packets()
 
-    def run(self):
-        self.asyncio_loop.run_until_complete(self.add_item())
+        # thread-safe data storage
 
     def update_interface(self):
         print(f"update_interface: {FilterParameters.interface}")
         self.label.config(text=f"interface: {FilterParameters.interface}")
-        self.update_packets()
-
-    async def add_item(self):
-        tasks = [
-            self.packets.append("666") for key in range(20)
-            # self.update_packets()
-        ]
-        await asyncio.wait(tasks)
-
-    async def do_data(self):
-        """ Creating and starting 'maxData' asyncio-tasks. """
-        tasks = [
-            self.create_dummy_data(key) for key in range(self.max_data)
-        ]
-        await asyncio.wait(tasks)
 
     def update_packets(self):
         print("sniffing started")
-        self.packet_table.pack(side=tk.TOP, fill=tk.X)
         # packets = sniff(iface=FilterParameters.interface, count=10)
         for item in self.packet_table.get_children():
             self.packet_table.delete(item)
-        # self.packet_table.delete(*self.packet_table.get_children())
         for packet in self.packets:
             # self.packet_table.insert("", tk.END, FilterParameters.packet_index, text=packet.summary())
             self.packet_table.insert("", tk.END, FilterParameters.packet_index, text=packet)
             FilterParameters.packet_index += 1
 
-        self.packet_table.update_idletasks()
         FilterParameters.stop_index -= 1
         print(f"sniffing step {FilterParameters.stop_index} finished")
         if FilterParameters.stop_index > -0:
+            pass
             # time.sleep(2)
             # self.add_item()
 
         #     self.after(500, self.controller.show_frame("PacketPage"))
         # print("sniffing finished")
 
+    def refresh_data(self):
+        print('RefreshDataEnter')
+        while not self.the_queue.empty():
+            print('Queue is not empty')
+            data = self.the_queue.get()
+            self.packet_table.insert("", tk.END, FilterParameters.packet_index, text=data)
+            time.sleep(2)
+            self.packet_table.update_idletasks()
+            FilterParameters.packet_index += 1
+
+        print('RefreshData...')
+        self.after(1000, self.refresh_data)
+
+    def do_asyncio(self):
+        self.thread.start()
+        self.after(1000, self.refresh_data)
+
+
+class AsyncioThread(threading.Thread):
+    def __init__(self, the_queue):
+        self.asyncio_loop = asyncio.get_event_loop()
+        self.the_queue = the_queue
+        threading.Thread.__init__(self)
+
+    def run(self):
+        self.asyncio_loop.run_until_complete(self.do_data())
+
+    async def do_data(self):
+        """ Creating and starting 'maxData' asyncio-tasks. """
+        tasks = [
+            self.create_dummy_data(i) for i in range(1000)
+        ]
+
+        print("dupa")
+        await asyncio.wait(tasks)
+
+    async def create_dummy_data(self, i):
+        print("create data")
+        self.the_queue.put(i)
 
 
 if __name__ == "__main__":
