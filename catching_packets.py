@@ -27,7 +27,7 @@ def get_host_for_ip(ip):
 
 if __name__ == '__main__':
     print("program wlaczony")
-    packets = sniff(iface="vEthernet (AWSI-External)", count=10)
+    packets = sniff(iface="WiFi", count=10)
     print(packets[0])
     summary = packets[0].summary()
     print(summary)
