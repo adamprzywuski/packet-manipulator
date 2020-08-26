@@ -63,8 +63,6 @@ class InterfacePage(tk.Frame):
             i = i + 1
 
         self.interface_listbox.pack(side=tk.TOP, fill=tk.X)
-        self.myLabel = tk.Label(self, text="123")
-        self.myLabel.pack(pady=5)
 
         self.select_button = tk.Button(self, text="Select", command=lambda: self.select())
         self.select_button.pack(pady=5)
@@ -82,8 +80,17 @@ class PacketPage(tk.Frame):
         self.controller = controller
         self.label = tk.Label(self, text=f"")
         self.label.pack(side="top", fill="x", pady=10)
+        self.packet_table = ttk.Treeview(self)
+        self.packet_table["columns"] = ("source", "destination", "protocol", "length", "info")
+        self.packet_table.heading("#0", text="Time", anchor=tk.W)
+        self.packet_table.heading("source", text="Source", anchor=tk.W)
+        self.packet_table.heading("destination", text="Destination", anchor=tk.W)
+        self.packet_table.heading("protocol", text="Protocol", anchor=tk.W)
+        self.packet_table.heading("length", text="Length", anchor=tk.W)
+        self.packet_table.heading("info", text="Info", anchor=tk.W)
+        self.packet_table.pack(side=tk.TOP, fill=tk.X)
         button = tk.Button(self, text="Change interface", command=lambda: controller.show_frame("InterfacePage"))
-        button.pack()
+        button.pack(pady=10)
 
     def update_interface(self):
         print(f"update_interface: {FilterParameters.interface}")

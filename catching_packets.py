@@ -25,5 +25,4 @@ def get_host_for_ip(ip):
 
 if __name__ == '__main__':
     print("program wlaczony")
-    sniff(filter="tcp", prn=packet_callback, store=0
-)
+    sniff(filter="tcp", prn=packet_callback, store=0)
