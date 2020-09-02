@@ -1,4 +1,3 @@
-import asyncio
 import queue
 import tkinter as tk
 import tkinter.ttk as ttk
@@ -6,7 +5,8 @@ from tkinter import font as tkfont
 from scapy.all import *
 import logging
 
-from show_interfaces import get_interfaces
+from model.interface import get_interfaces
+from model.ip_packet import IpPacket
 
 logging.basicConfig(level=logging.DEBUG,
                     format='(%(threadName)-9s) %(message)s', )
@@ -14,7 +14,6 @@ logging.basicConfig(level=logging.DEBUG,
 
 class FilterParameters:
     interface = ""
-    stop_index = 10
     packet_index = 0
 
 
@@ -94,15 +93,14 @@ class PacketPage(tk.Frame, threading.Thread):
         self.label = tk.Label(self, text=f"")
         self.label.pack(side="top", fill="x", pady=10)
         self.packet_table = ttk.Treeview(self)
-        self.packet_table["columns"] = ("source", "destination", "protocol", "length", "info")
+        self.packet_table["columns"] = ("source", "destination", "protocol", "length", "ttl")
         self.packet_table.heading("#0", text="Time", anchor=tk.W)
         self.packet_table.heading("source", text="Source", anchor=tk.W)
         self.packet_table.heading("destination", text="Destination", anchor=tk.W)
         self.packet_table.heading("protocol", text="Protocol", anchor=tk.W)
         self.packet_table.heading("length", text="Length", anchor=tk.W)
-        self.packet_table.heading("info", text="Info", anchor=tk.W)
+        self.packet_table.heading("ttl", text="TTL", anchor=tk.W)
         self.packet_table.pack(side=tk.TOP, fill=tk.X)
-        self.packets = ["123", "456", "789"]
         self.consumer = ConsumerThread(self.the_queue, self.packet_table)
         self.producer = ProducerThread(self.the_queue)
         button = tk.Button(self, text="Change interface", command=lambda: controller.show_frame("InterfacePage"))
@@ -129,9 +127,14 @@ class ConsumerThread(threading.Thread):
 
     def refresh_data(self, ):
         while not self.the_queue.empty():
-            data = self.the_queue.get()
+            data: IpPacket = self.the_queue.get()
             logging.debug('get ' + str(data) + ' ' + str(FilterParameters.packet_index))
-            self.table.insert("", tk.END, FilterParameters.packet_index, text=data)
+            self.table.insert("", tk.END, FilterParameters.packet_index, text=FilterParameters.packet_index,
+                              values=(data.source,
+                                      data.destination,
+                                      data.protocol,
+                                      data.length,
+                                      data.ttl))
             self.table.update_idletasks()
             FilterParameters.packet_index += 1
 
@@ -147,8 +150,9 @@ class ProducerThread(threading.Thread):
 
     def sniff_packets(self):
         packet = sniff(iface=FilterParameters.interface, count=1)
+        ip_packet = IpPacket(packet[0])
         logging.debug('create ' + packet[0].summary())
-        self.the_queue.put(packet[0].summary())
+        self.the_queue.put(ip_packet)
 
 
 if __name__ == "__main__":

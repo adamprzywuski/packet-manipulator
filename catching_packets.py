@@ -2,7 +2,7 @@ from scapy.all import *
 import logging
 
 logging.getLogger("scapy.runtime").setLevel(logging.ERROR)
-from show_packets import Packet
+from model.ip_packet import IpPacket
 
 
 def packet_callback(packet):
@@ -31,6 +31,6 @@ if __name__ == '__main__':
     packets = sniff(count=5)
     for p in packets:
 
-        a = Packet(p)
+        a = IpPacket(p)
         print(a)
 
