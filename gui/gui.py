@@ -1,12 +1,15 @@
 import asyncio
 import queue
-import time
 import tkinter as tk
 import tkinter.ttk as ttk
 from tkinter import font as tkfont
 from scapy.all import *
+import logging
 
 from show_interfaces import get_interfaces
+
+logging.basicConfig(level=logging.DEBUG,
+                    format='(%(threadName)-9s) %(message)s', )
 
 
 class FilterParameters:
@@ -87,7 +90,6 @@ class PacketPage(tk.Frame, threading.Thread):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
         self.the_queue = queue.Queue()
-        self.thread = AsyncioThread(self.the_queue)
         self.controller = controller
         self.label = tk.Label(self, text=f"")
         self.label.pack(side="top", fill="x", pady=10)
@@ -101,75 +103,52 @@ class PacketPage(tk.Frame, threading.Thread):
         self.packet_table.heading("info", text="Info", anchor=tk.W)
         self.packet_table.pack(side=tk.TOP, fill=tk.X)
         self.packets = ["123", "456", "789"]
+        self.consumer = ConsumerThread(self.the_queue, self.packet_table)
+        self.producer = ProducerThread(self.the_queue)
         button = tk.Button(self, text="Change interface", command=lambda: controller.show_frame("InterfacePage"))
         button.pack(pady=10)
-        # self.update_packets()
-
-        # thread-safe data storage
 
     def update_interface(self):
         print(f"update_interface: {FilterParameters.interface}")
         self.label.config(text=f"interface: {FilterParameters.interface}")
 
-    def update_packets(self):
-        print("sniffing started")
-        # packets = sniff(iface=FilterParameters.interface, count=10)
-        for item in self.packet_table.get_children():
-            self.packet_table.delete(item)
-        for packet in self.packets:
-            # self.packet_table.insert("", tk.END, FilterParameters.packet_index, text=packet.summary())
-            self.packet_table.insert("", tk.END, FilterParameters.packet_index, text=packet)
-            FilterParameters.packet_index += 1
-
-        FilterParameters.stop_index -= 1
-        print(f"sniffing step {FilterParameters.stop_index} finished")
-        if FilterParameters.stop_index > -0:
-            pass
-            # time.sleep(2)
-            # self.add_item()
-
-        #     self.after(500, self.controller.show_frame("PacketPage"))
-        # print("sniffing finished")
-
-    def refresh_data(self):
-        print('RefreshDataEnter')
-        while not self.the_queue.empty():
-            print('Queue is not empty')
-            data = self.the_queue.get()
-            self.packet_table.insert("", tk.END, FilterParameters.packet_index, text=data)
-            time.sleep(2)
-            self.packet_table.update_idletasks()
-            FilterParameters.packet_index += 1
-
-        print('RefreshData...')
-        self.after(1000, self.refresh_data)
-
     def do_asyncio(self):
-        self.thread.start()
-        self.after(1000, self.refresh_data)
+        self.producer.start()
+        self.consumer.start()
 
 
-class AsyncioThread(threading.Thread):
-    def __init__(self, the_queue):
-        self.asyncio_loop = asyncio.get_event_loop()
+class ConsumerThread(threading.Thread):
+    def __init__(self, the_queue, table):
+        super().__init__()
         self.the_queue = the_queue
-        threading.Thread.__init__(self)
+        self.table = table
 
     def run(self):
-        self.asyncio_loop.run_until_complete(self.do_data())
+        while True:
+            self.refresh_data()
 
-    async def do_data(self):
-        """ Creating and starting 'maxData' asyncio-tasks. """
-        tasks = [
-            self.create_dummy_data(i) for i in range(1000)
-        ]
+    def refresh_data(self, ):
+        while not self.the_queue.empty():
+            data = self.the_queue.get()
+            logging.debug('get ' + str(data) + ' ' + str(FilterParameters.packet_index))
+            self.table.insert("", tk.END, FilterParameters.packet_index, text=data)
+            self.table.update_idletasks()
+            FilterParameters.packet_index += 1
 
-        print("dupa")
-        await asyncio.wait(tasks)
 
-    async def create_dummy_data(self, i):
-        print("create data")
-        self.the_queue.put(i)
+class ProducerThread(threading.Thread):
+    def __init__(self, the_queue):
+        super().__init__()
+        self.the_queue = the_queue
+
+    def run(self):
+        while True:
+            self.sniff_packets()
+
+    def sniff_packets(self):
+        packet = sniff(iface=FilterParameters.interface, count=1)
+        logging.debug('create ' + packet[0].summary())
+        self.the_queue.put(packet[0].summary())
 
 
 if __name__ == "__main__":

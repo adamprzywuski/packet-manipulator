@@ -1,8 +1,7 @@
+from tkinter import *
 import asyncio
-import random
 import threading
-from tkinter import Button, Label
-
+import random
 import queue
 
 
@@ -102,3 +101,4 @@ class TheWindow:
 if __name__ == '__main__':
     window = TheWindow(10)
     window.root.mainloop()
+
