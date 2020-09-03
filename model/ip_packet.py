@@ -15,7 +15,7 @@ class IpPacket:
         self.length = packet['IP'].len
         self.ttl = packet['IP'].ttl
         # self.info = str(bytes(packet['Raw'].load))
-        self.protocol = ip_proto(packet['IP'])
+        self.protocol = ip_proto(packet['IP']).capitalize()
 
     def __str__(self):
         return "Date: {0}, Source:{1}, Destination:{2}, Length:{3},Protocol:{4}, Info:{5}" \
