@@ -93,6 +93,8 @@ class PacketPage(tk.Frame, threading.Thread):
         self.label = tk.Label(self, text=f"")
         self.label.pack(side="top", fill="x", pady=10)
         self.packet_table = ttk.Treeview(self)
+        self.scrollbar = ttk.Scrollbar(self.packet_table, orient="vertical", command=self.packet_table.yview)
+        self.packet_table.configure(yscrollcommand=self.scrollbar.set)
         self.packet_table["columns"] = ("source", "destination", "protocol", "length", "ttl")
         self.packet_table.heading("#0", text="Time", anchor=tk.W)
         self.packet_table.heading("source", text="Source", anchor=tk.W)
@@ -100,11 +102,13 @@ class PacketPage(tk.Frame, threading.Thread):
         self.packet_table.heading("protocol", text="Protocol", anchor=tk.W)
         self.packet_table.heading("length", text="Length", anchor=tk.W)
         self.packet_table.heading("ttl", text="TTL", anchor=tk.W)
-        self.packet_table.pack(side=tk.TOP, fill=tk.X)
+        self.packet_table.pack(side="top", fill="both", expand=True)
+        self.scrollbar.pack(side="right", fill="y")
         self.consumer = ConsumerThread(self.the_queue, self.packet_table)
         self.producer = ProducerThread(self.the_queue)
         button = tk.Button(self, text="Change interface", command=lambda: controller.show_frame("InterfacePage"))
-        button.pack(pady=10)
+        button.pack(pady=10, side=tk.BOTTOM)
+
 
     def update_interface(self):
         print(f"update_interface: {FilterParameters.interface}")
