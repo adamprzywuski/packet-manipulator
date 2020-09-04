@@ -9,14 +9,20 @@ def ip_proto(pkt):
 
 class IpPacket:
     def __init__(self, packet):
-        
+
         self.time = time.clock()
         self.source = packet['IP'].src
         self.destination = packet['IP'].dst
         self.length = packet['IP'].len
         self.ttl = packet['IP'].ttl
         self.info = " "
-        self.protocol = ip_proto(packet['IP']).upper()
+        try:
+            self.protocol = ip_proto(packet['IP']).upper()
+        except:
+            print("Exception with the protocols")
+            self.protocol = packet['IP'].proto
+            if(self.protocol==2):
+                self.protocol="IGMP"
         if(self.protocol=='TCP' or self.protocol=='UDP'):
             self.info = str(bytes(packet[self.protocol].payload))
             if packet['IP'].dport==20 or packet['IP'].dport==21:
