@@ -77,3 +77,8 @@ class PacketPage(tk.Frame, threading.Thread):
     def OnDoubleClick(self, event):
         item = self.packet_table.selection()[0]
         print("you clicked on", self.the_queue.get(item))
+        window=tk.Tk()
+        window.title("Packet")
+        window.geometry("400x200")
+        #txt=tk.Entry(window,width=10)
+        #txt.grid(column=1,row=0)
