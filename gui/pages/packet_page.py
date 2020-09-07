@@ -44,6 +44,8 @@ class PacketPage(tk.Frame, threading.Thread):
         self.join_threads()
         self.controller.show_frame("InterfacePage")
 
+
+
     def __create_widgets(self):
         self.label = tk.Label(self, text=f"")
         self.label.pack(side="top", fill="x", pady=10)
@@ -59,6 +61,7 @@ class PacketPage(tk.Frame, threading.Thread):
         self.packet_table.heading("length", text="Length", anchor=tk.W)
         self.packet_table.heading("ttl", text="TTL", anchor=tk.W)
         self.packet_table.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+        self.packet_table.bind("<Double-1>", self.OnDoubleClick)
         self.scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
 
         button_frame = tk.Frame(self)
@@ -70,3 +73,7 @@ class PacketPage(tk.Frame, threading.Thread):
         button.pack(side=button_side, padx=10)
         button = tk.Button(button_frame, text="Stop", command=lambda: self.join_threads())
         button.pack(side=button_side)
+
+    def OnDoubleClick(self, event):
+        item = self.packet_table.selection()[0]
+        print("you clicked on", self.the_queue.get(item))

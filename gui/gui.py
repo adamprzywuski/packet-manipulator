@@ -36,4 +36,7 @@ class Gui(tk.Tk):
             self.after(0, frame.start_asyncio())
 
     def get_frame(self, page_name):
+
         return self.frames[page_name]
+
+

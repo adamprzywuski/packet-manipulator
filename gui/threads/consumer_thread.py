@@ -34,3 +34,5 @@ class ConsumerThread(threading.Thread):
                                       data.ttl))
             self.table.update_idletasks()
             GlobalParameters.packet_index += 1
+
+
