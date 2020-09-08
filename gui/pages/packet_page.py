@@ -111,39 +111,40 @@ class PacketPage(tk.Frame, threading.Thread):
 
 
 
-        button = tk.Button( window,text="Resend Packet", command=lambda:self.SendPacket(packet) )
+        button = tk.Button( window,text="Resend Packet", command=lambda:self.SendPacket(entry_destination.get(),entry_protocol.get(),packet.flags) )
         button.place(x=160,y=300)
 
-    def SendPacket(self,Packet):
+    def SendPacket(self,destination,protocol,flag):
 
 
     #TODO:ADDING MAC ADRESSS WHICH WE SENDS DATA,because it using broadcast
         layer1=Ether()
-        layer2=IP(dst=Packet.destination)
-        if(Packet.protocol=="FTP"):
-            layer3=TCP(dport=20, flags=Packet.flags)
-        elif(Packet.protocol=="SSH"):
-            layer3 =TCP(dport=22, flags=Packet.flags)
-        elif (Packet.protocol == "Telnet"):
-            layer3 =TCP(dport=23, flags=Packet.flags)
-        elif (Packet.protocol == "SMTP"):
-            layer3 =TCP(dport=25, flags=Packet.flags)
-        elif (Packet.protocol == "DNS"):
-            layer3 =TCP(dport=53, flags=Packet.flags)
-        elif (Packet.protocol == "DHCP"):
-            layer3 =UDP(dport=67, flags=Packet.flags)
-        elif (Packet.protocol == "HTTP"):
-            layer3 =TCP(dport=80, flags=Packet.flags)
-        elif (Packet.protocol == "HTTPS"):
-            layer3 =TCP(dport=443, flags=Packet.flags)
+        layer2=IP(dst=destination)
+        if(protocol=="FTP"):
+            layer3=TCP(dport=20, flags=flag)
+        elif(protocol=="SSH"):
+            layer3 =TCP(dport=22, flags=flag)
+        elif (protocol == "Telnet"):
+            layer3 =TCP(dport=23, flags=flag)
+        elif (protocol == "SMTP"):
+            layer3 =TCP(dport=25, flags=flag)
+        elif (protocol == "DNS"):
+            layer3 =TCP(dport=53, flags=flag)
+        elif (protocol == "DHCP"):
+            layer3 =UDP(dport=67, flags=flag)
+        elif (protocol == "HTTP"):
+            layer3 =TCP(dport=80, flags=flag)
+        elif (protocol == "HTTPS"):
+            layer3 =TCP(dport=443, flags=flag)
         else:
-            regex=re.search('[0-9]+',Packet.protocol)
+            regex=re.search('[0-9]+',protocol)
             port=int(regex.group(0))
-            if(Packet.protocol[0]=='T'):
+            print(port)
+            if(protocol[0]=='T'):
                 #its TCP protocol
-                layer3=TCP(dport=port,flags=Packet.flags)
-            elif(Packet.protocol[0]=='U'):
-                layer3=UDP(dport=port,flags=Packet.flags)
+                layer3=TCP(dport=port,flags=flag)
+            elif(protocol[0]=='U'):
+                layer3=UDP(dport=port,flags=flag)
 
-
+        
         send(layer1/layer2/layer3)
