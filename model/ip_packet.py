@@ -1,5 +1,5 @@
 import time
-import scapy.all
+from scapy.all import *
 
 
 def ip_proto(pkt):
@@ -15,6 +15,7 @@ class IpPacket:
         self.destination = packet['IP'].dst
         self.length = packet['IP'].len
         self.ttl = packet['IP'].ttl
+        self.flags=packet['IP'].flags
         self.info = " "
         try:
             self.protocol = ip_proto(packet['IP']).upper()
@@ -25,6 +26,7 @@ class IpPacket:
                 self.protocol="IGMP"
         if(self.protocol=='TCP' or self.protocol=='UDP'):
             self.info = str(bytes(packet[self.protocol].payload))
+
             if packet['IP'].dport==20 or packet['IP'].dport==21:
                 self.protocol = "FTP"
             elif packet['IP'].dport==22:

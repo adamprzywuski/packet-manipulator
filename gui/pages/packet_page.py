@@ -2,6 +2,8 @@ import queue
 import threading
 import tkinter as tk
 import tkinter.ttk as ttk
+from scapy.all import *
+import re
 
 from gui.threads.consumer_thread import ConsumerThread
 from gui.parameters.filter_parameters import FilterParameters
@@ -106,3 +108,42 @@ class PacketPage(tk.Frame, threading.Thread):
         entry_raw = tk.Entry(window)
         entry_raw.place(x=160, y=130,height=100)
         entry_raw.insert(0,packet.info)
+
+
+
+        button = tk.Button( window,text="Resend Packet", command=lambda:self.SendPacket(packet) )
+        button.place(x=160,y=300)
+
+    def SendPacket(self,Packet):
+
+
+    #TODO:ADDING MAC ADRESSS WHICH WE SENDS DATA,because it using broadcast
+        layer1=Ether()
+        layer2=IP(dst=Packet.destination)
+        if(Packet.protocol=="FTP"):
+            layer3=TCP(dport=20, flags=Packet.flags)
+        elif(Packet.protocol=="SSH"):
+            layer3 =TCP(dport=22, flags=Packet.flags)
+        elif (Packet.protocol == "Telnet"):
+            layer3 =TCP(dport=23, flags=Packet.flags)
+        elif (Packet.protocol == "SMTP"):
+            layer3 =TCP(dport=25, flags=Packet.flags)
+        elif (Packet.protocol == "DNS"):
+            layer3 =TCP(dport=53, flags=Packet.flags)
+        elif (Packet.protocol == "DHCP"):
+            layer3 =UDP(dport=67, flags=Packet.flags)
+        elif (Packet.protocol == "HTTP"):
+            layer3 =TCP(dport=80, flags=Packet.flags)
+        elif (Packet.protocol == "HTTPS"):
+            layer3 =TCP(dport=443, flags=Packet.flags)
+        else:
+            regex=re.search('[0-9]+',Packet.protocol)
+            port=int(regex.group(0))
+            if(Packet.protocol[0]=='T'):
+                #its TCP protocol
+                layer3=TCP(dport=port,flags=Packet.flags)
+            elif(Packet.protocol[0]=='U'):
+                layer3=UDP(dport=port,flags=Packet.flags)
+
+
+        send(layer1/layer2/layer3)
