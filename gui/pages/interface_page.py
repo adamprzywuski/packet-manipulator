@@ -12,7 +12,7 @@ class InterfacePage(tk.Frame):
         self.__create_widgets()
 
     def select(self):
-        FilterParameters.interface = self.interface_list[int(self.interface_listbox.focus()) - 1].name
+        FilterParameters.interface = self.interface_list[int(self.interface_listbox.focus())].name
         print(f"select: {FilterParameters.interface}")
         self.controller.get_frame("PacketPage").update_interface()
         self.controller.show_frame("PacketPage")
@@ -32,9 +32,9 @@ class InterfacePage(tk.Frame):
         self.interface_listbox.heading("mac", text="MAC", anchor=tk.W)
         self.interface_listbox.heading("desc", text="Description", anchor=tk.W)
 
-        i = 1
+        i = 0
         for interface in self.interface_list:
-            self.interface_listbox.insert("", i, i, text=interface.name, values=(interface.ipv4,
+            self.interface_listbox.insert("", tk.END, i, text=interface.name, values=(interface.ipv4,
                                                                                  interface.ipv6,
                                                                                  interface.mac,
                                                                                  interface.desc))

@@ -38,5 +38,3 @@ class Gui(tk.Tk):
     def get_frame(self, page_name):
 
         return self.frames[page_name]
-
-

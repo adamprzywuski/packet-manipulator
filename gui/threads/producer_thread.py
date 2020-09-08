@@ -23,7 +23,7 @@ class ProducerThread(threading.Thread):
                 break
 
     def sniff_packets(self):
-        packet = sniff(iface=FilterParameters.interface,filter='ip', count=1)
+        packet = sniff(iface=FilterParameters.interface, filter='ip', count=1)
         ip_packet = IpPacket(packet[0])
         logging.debug('create ' + packet[0].summary())
         self.the_queue.put(ip_packet)

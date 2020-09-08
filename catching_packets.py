@@ -1,6 +1,7 @@
 from scapy.all import *
 import logging
 import scapy
+
 logging.getLogger("scapy.runtime").setLevel(logging.ERROR)
 from model.ip_packet import IpPacket
 
@@ -28,10 +29,10 @@ def get_host_for_ip(ip):
 
 if __name__ == '__main__':
     print("program wlaczony")
-    #packets = sniff(count=5)
-    #for p in packets:
+    # packets = sniff(count=5)
+    # for p in packets:
 
-     #   a = IpPacket(p)
-      #  print(a)
-    packet=Ether()/IP(dst='8.8.8.8')/TCP(dport=53,flags='S')
+    #   a = IpPacket(p)
+    #  print(a)
+    packet = Ether() / IP(dst='8.8.8.8') / TCP(dport=53, flags='S')
     send(packet)
