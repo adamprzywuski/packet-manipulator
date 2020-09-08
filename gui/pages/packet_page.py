@@ -139,14 +139,13 @@ class PacketPage(tk.Frame, threading.Thread):
         else:
             regex=re.search('[0-9]+',protocol)
             port=int(regex.group(0))
-            print(port)
             if(protocol[0]=='T'):
                 #its TCP protocol
                 layer3=TCP(dport=port,flags=flag)
             elif(protocol[0]=='U'):
-                layer3=UDP(dport=port,flags=flag)
+                layer3=UDP(dport=port)
 
         try:
-            send(layer1/layer2/layer3)
+            sendp(layer1/layer2/layer3)
         except:
             print("Exception with sending packet")
