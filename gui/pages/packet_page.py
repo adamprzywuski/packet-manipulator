@@ -146,5 +146,7 @@ class PacketPage(tk.Frame, threading.Thread):
             elif(protocol[0]=='U'):
                 layer3=UDP(dport=port,flags=flag)
 
-        
-        send(layer1/layer2/layer3)
+        try:
+            send(layer1/layer2/layer3)
+        except:
+            print("Exception with sending packet")
