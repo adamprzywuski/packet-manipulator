@@ -11,7 +11,7 @@ def packet_callback(packet):
         print(packet.proto)
         # if packet['IP'].dport == 80:
         print("\n{} ----HTTP----> {}:{}:\n{}".format(packet['IP'].src, packet['IP'].dst, packet['IP'].dport,
-                                                     str(bytes(packet['TCP'].payload))))
+                                                     str(bytes(packet['TCP'].load))))
 
         # print(get_host_for_ip(packet['IP'].src))
         sniff(filter="tcp", prn=packet_callback, store=0)

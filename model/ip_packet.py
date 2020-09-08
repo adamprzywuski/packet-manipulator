@@ -43,6 +43,8 @@ class IpPacket:
                     self.protocol = "HTTPS"
             else:
                 self.protocol=self.protocol+" : "+str(packet['IP'].dport)
+        else:
+            self.info=str(bytes(packet['Raw'].load))
 
 
 

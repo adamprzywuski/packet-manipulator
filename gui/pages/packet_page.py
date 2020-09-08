@@ -7,6 +7,7 @@ from gui.threads.consumer_thread import ConsumerThread
 from gui.parameters.filter_parameters import FilterParameters
 from gui.parameters.global_parameters import GlobalParameters
 from gui.threads.producer_thread import ProducerThread
+from model.ip_packet import IpPacket
 
 
 class PacketPage(tk.Frame, threading.Thread):
@@ -76,9 +77,32 @@ class PacketPage(tk.Frame, threading.Thread):
 
     def OnDoubleClick(self, event):
         item = self.packet_table.selection()[0]
-        print("you clicked on", self.the_queue.get(item))
+        packet=self.the_queue.get(item)
+        print("you clicked on", packet)
         window=tk.Tk()
         window.title("Packet")
-        window.geometry("400x200")
-        #txt=tk.Entry(window,width=10)
-        #txt.grid(column=1,row=0)
+        window.geometry("400x400")
+        label_source=tk.Label(window,text="Source",width=20)
+        label_source.place(x=60,y=40)
+        entry_source = tk.Entry(window)
+        entry_source.place(x=160, y=40)
+        entry_source.insert(0,packet.source)
+
+        label_destination=tk.Label(window,text="Destination",width=20)
+        label_destination.place(x=50,y=70)
+        entry_destination = tk.Entry(window)
+        entry_destination.place(x=160, y=70)
+        entry_destination.insert(0,packet.destination)
+
+        label_protocol=tk.Label(window,text="Protocol",width=20)
+        label_protocol.place(x=60,y=100)
+        entry_protocol = tk.Entry(window)
+        entry_protocol.place(x=160, y=100)
+        entry_protocol.insert(0,packet.protocol)
+
+#TODO:Fixing placeholder for a RawData
+        label_raw=tk.Label(window,text="Raw",width=20)
+        label_raw.place(x=60,y=130)
+        entry_raw = tk.Entry(window)
+        entry_raw.place(x=160, y=130,height=100)
+        entry_raw.insert(0,packet.info)
