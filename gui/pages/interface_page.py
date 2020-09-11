@@ -11,7 +11,7 @@ class InterfacePage(tk.Frame):
         self.controller = controller
         self.__create_widgets()
 
-    def select(self):
+    def select(self, event):
         FilterParameters.interface = self.interface_list[int(self.interface_listbox.focus())].name
         print(f"select: {FilterParameters.interface}")
         self.controller.get_frame("PacketPage").update_interface()
@@ -35,13 +35,14 @@ class InterfacePage(tk.Frame):
         i = 0
         for interface in self.interface_list:
             self.interface_listbox.insert("", tk.END, i, text=interface.name, values=(interface.ipv4,
-                                                                                 interface.ipv6,
-                                                                                 interface.mac,
-                                                                                 interface.desc))
+                                                                                      interface.ipv6,
+                                                                                      interface.mac,
+                                                                                      interface.desc))
             i = i + 1
 
         self.interface_listbox.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
         self.scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        self.interface_listbox.bind("<Double-1>", lambda event: self.select(event=event))
 
-        self.select_button = tk.Button(self, text="Select", command=lambda: self.select())
-        self.select_button.pack(pady=5)
+        # self.select_button = tk.Button(self, text="Select", command=lambda event: self.select(event=event))
+        # self.select_button.pack(pady=5)

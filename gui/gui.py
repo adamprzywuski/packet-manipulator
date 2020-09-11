@@ -13,7 +13,9 @@ class Gui(tk.Tk):
     def __init__(self):
         tk.Tk.__init__(self)
         self.geometry("1100x400")
-        self.title_font = tkfont.Font(family='Helvetica', size=18, weight="bold", slant="italic")
+        self.iconbitmap("dolphin.ico")
+        self.winfo_toplevel().title("WireDolphin")
+        self.title_font = tkfont.Font(size=18, weight="bold", slant="italic")
         self.container = tk.Frame(self)
         self.container.pack(side="top", fill="both", expand=True)
         self.container.grid_rowconfigure(0, weight=1)
