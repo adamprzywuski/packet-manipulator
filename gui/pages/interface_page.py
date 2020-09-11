@@ -44,5 +44,5 @@ class InterfacePage(tk.Frame):
         self.scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
         self.interface_listbox.bind("<Double-1>", lambda event: self.select(event=event))
 
-        self.select_button = tk.Button(self, text="Select", command=lambda: self.select())
-        self.select_button.pack(pady=5)
+        # self.select_button = tk.Button(self, text="Select", command=lambda event: self.select(event=event))
+        # self.select_button.pack(pady=5)

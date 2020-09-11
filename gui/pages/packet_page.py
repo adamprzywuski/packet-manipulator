@@ -90,6 +90,7 @@ class PacketPage(tk.Frame, threading.Thread):
         window = tk.Tk()
         window.title("Packet")
         window.geometry("900x500")
+        window.iconbitmap("dolphin.ico")
 
         address_frame = tk.Frame(window)
         address_frame.pack(side=tk.TOP, anchor=tk.NW, pady=10)
