@@ -72,7 +72,7 @@ class PacketPage(tk.Frame, threading.Thread):
         self.packet_table.heading("length", text="Length", anchor=tk.W)
         self.packet_table.heading("ttl", text="TTL", anchor=tk.W)
         self.packet_table.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
-        self.packet_table.bind("<Double-1>", self.OnDoubleClick)
+        self.packet_table.bind("<Double-1>", self.on_double_click)
         self.scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
 
         button_frame = tk.Frame(self)
@@ -83,42 +83,48 @@ class PacketPage(tk.Frame, threading.Thread):
         button = tk.Button(button_frame, text="Pause/Resume", command=lambda: self.pause_resume())
         button.pack(side=button_side, padx=10)
 
-    def OnDoubleClick(self, event):
+    def on_double_click(self, event):
         item_index = int(self.packet_table.focus())
         selected_packet = self.packets_list[item_index]
         print("you clicked on", selected_packet)
         window = tk.Tk()
         window.title("Packet")
-        window.geometry("400x400")
-        label_source = tk.Label(window, text="Source", width=20)
-        label_source.place(x=60, y=40)
-        entry_source = tk.Entry(window)
-        entry_source.place(x=160, y=40)
+        window.geometry("900x500")
+
+        address_frame = tk.Frame(window)
+        address_frame.pack(side=tk.TOP, anchor=tk.NW, pady=10)
+        label_source = tk.Label(address_frame, text="Source", width=20)
+        label_source.pack(side=tk.LEFT)
+        entry_source = tk.Entry(address_frame)
+        entry_source.pack(side=tk.LEFT)
         entry_source.insert(0, selected_packet.source)
 
-        label_destination = tk.Label(window, text="Destination", width=20)
-        label_destination.place(x=50, y=70)
-        entry_destination = tk.Entry(window)
-        entry_destination.place(x=160, y=70)
+        label_destination = tk.Label(address_frame, text="Destination", width=20)
+        label_destination.pack(side=tk.LEFT)
+        entry_destination = tk.Entry(address_frame)
+        entry_destination.pack(side=tk.LEFT)
         entry_destination.insert(0, selected_packet.destination)
 
-        label_protocol = tk.Label(window, text="Protocol", width=20)
-        label_protocol.place(x=60, y=100)
-        entry_protocol = tk.Entry(window)
-        entry_protocol.place(x=160, y=100)
+        label_protocol = tk.Label(address_frame, text="Protocol", width=20)
+        label_protocol.pack(side=tk.LEFT)
+        entry_protocol = tk.Entry(address_frame)
+        entry_protocol.pack(side=tk.LEFT)
         entry_protocol.insert(0, selected_packet.protocol)
 
-        label_raw = tk.Label(window, text="Raw", width=20)
-        label_raw.place(x=60, y=130)
-        entry_raw = tk.Entry(window)
-        entry_raw.place(x=160, y=130, height=100)
-        entry_raw.insert(0, selected_packet.info)
+        raw_frame = tk.Frame(window)
+        raw_frame.pack(side=tk.TOP, anchor=tk.W, pady=10)
+        label_raw = tk.Label(raw_frame, text="Raw", width=20)
+        label_raw.pack(side=tk.LEFT)
+        entry_raw = tk.Text(raw_frame, wrap=tk.CHAR)
+        entry_raw.pack(side=tk.LEFT)
+        entry_raw.insert(tk.END, str(selected_packet.info))
+        print(str(selected_packet.info))
 
         button = tk.Button(window, text="Resend Packet",
-                           command=lambda: self.SendPacket(entry_destination.get(), entry_protocol.get(), selected_packet.flags))
-        button.place(x=160, y=300)
+                           command=lambda: self.send_packet(entry_destination.get(), entry_protocol.get(), selected_packet.flags))
+        button.pack(side=tk.TOP, pady=10)
 
-    def SendPacket(self, destination, protocol, flag):
+    def send_packet(self, destination, protocol, flag):
 
         layer1 = Ether()
         layer2 = IP(dst=destination)
